@@ -35,12 +35,11 @@ def not_author_client(not_author):
 
 
 @pytest.fixture
-def news(author):
+def news():
     news = News.objects.create(  # Создаём объект заметки.
         title='Заголовок',
-        text='Текст заметки',
-        slug='news-slug',
-        author=author,
+        text='Текст новости',
+        date='2023-10-05',
     )
     return news
 
@@ -48,7 +47,7 @@ def news(author):
 @pytest.fixture
 # Фикстура запрашивает другую фикстуру создания заметки.
 def slug_for_args(news):
-    return (news.slug,)
+    return (news.date,)
 
 
 @pytest.fixture
@@ -56,5 +55,5 @@ def form_data():
     return {
         'title': 'Новый заголовок',
         'text': 'Новый текст',
-        'slug': 'new-slug'
+        'date': '2023-10-05'
     }
