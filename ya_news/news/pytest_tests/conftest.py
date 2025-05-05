@@ -5,7 +5,7 @@ import pytest
 from django.test.client import Client
 
 # Импортируем модель заметки, чтобы создать экземпляр.
-from news.models import News
+from news.models import Comment, News
 
 
 @pytest.fixture

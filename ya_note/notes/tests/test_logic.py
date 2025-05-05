@@ -15,14 +15,14 @@ class TestLogic(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.notes = Note.objects.create(title='Заголовок',
-                                        text='Текст',
-                                        author=cls.author,
-                                        slug='note-slug')
-        cls.url = reverse('notes:detail', args=(cls.notes.id,))
         cls.author = User.objects.create(username='Автор')
         cls.author_client = Client()
-        cls.author_client.force_login(cls.user)
+        cls.author_client.force_login(cls.author)
+        cls.note = Note.objects.create(title='Заголовок',
+                                       text='Текст',
+                                       author=cls.author,
+                                       slug='note-slug')
+        cls.url = reverse('notes:detail', args=(cls.note.id,))
         cls.form_data = {
             'title': 'Новый заголовок',
             'text': 'Новый текст',
@@ -69,11 +69,9 @@ class TestLogic(TestCase):
     def test_not_unique_slug(self):
         self.form_data['slug'] = self.note.slug
         response = self.author_client.post(self.add_url, data=self.form_data)
+        form = response.context['form']
 
-        self.assertFormError(response,
-                             'form',
-                             'slug',
-                             errors=(self.note.slug + WARNING))
+        self.assertFormError(form, 'slug', self.note.slug + WARNING)
         self.assertEqual(Note.objects.count(), 1)
 
     def test_author_can_delete_note(self):
@@ -82,7 +80,7 @@ class TestLogic(TestCase):
         self.assertEqual(Note.objects.count(), 0)
 
     def test_user_cant_delete_note_of_another_user(self):
-        response = self.author_client.delete(self.delete_url)
+        response = self.reader_client.delete(self.delete_url)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertEqual(Note.objects.count(), 1)
 

@@ -6,7 +6,6 @@ from django.urls import reverse
 
 from notes.models import Note
 
-# Получаем модель пользователя.
 User = get_user_model()
 
 
@@ -19,7 +18,7 @@ class TestRoutes(TestCase):
         cls.client_author = Client()
         cls.client_reader = Client()
         cls.client_author.force_login(cls.author)
-        cls.client_reader.force_login(cls.not_author)
+        cls.client_reader.force_login(cls.reader)
         cls.note = Note.objects.create(
             author=cls.author,
             title='Заголовок',
@@ -29,33 +28,30 @@ class TestRoutes(TestCase):
 
     def test_pages_availability(self):
         urls = (
-            ('notes:home', None),
-            ('notes:detail', (self.note.id,)),
-            ('users:login', None),
-            ('users:logout', None),
-            ('users:signup', None),
+            'notes:home',
+            'users:login',
+            'users:signup',
+            'users:logout'
         )
-        for name, args in urls:
+        for name in urls:
             with self.subTest(name=name):
-                url = reverse(name, args=args)
-                response = self.client.get(url)
+                url = reverse(name)
+                if name == 'users:logout':
+                    response = self.client.post(url)  # Изменяем метод на POST
+                else:
+                    response = self.client.get(url)
                 self.assertEqual(response.status_code, HTTPStatus.OK)
 
-    def test_page_accessibility_for_an_authorized_user_and_reader(self):
+    def test_page_accessibility_for_author_and_reader(self):
         users_statuses = (
             (self.author, HTTPStatus.OK),
             (self.reader, HTTPStatus.NOT_FOUND),
         )
         for user, status in users_statuses:
             self.client.force_login(user)
-            for name in ('notes:edit',
-                         'notes:delete',
-                         'notes:detail',
-                         'notes:add',
-                         'notes:list',
-                         'notes:succes',):
+            for name in ('notes:detail', 'notes:edit', 'notes:delete'):
                 with self.subTest(user=user, name=name):
-                    url = reverse(name, args=(self.note.slug,))
+                    url = reverse(name, args=[self.note.slug])
                     response = self.client.get(url)
                     self.assertEqual(response.status_code, status)
 
