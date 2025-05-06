@@ -2,12 +2,9 @@ from datetime import timedelta
 
 import pytest
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.test.client import Client
 from news.models import Comment, News
-
-User = get_user_model()
 
 
 @pytest.fixture
@@ -21,17 +18,16 @@ def reader(django_user_model):
 
 
 @pytest.fixture
-def author_client(author):  # Вызываем фикстуру автора.
-    # Создаём новый экземпляр клиента, чтобы не менять глобальный.
+def author_client(author):
     client = Client()
-    client.force_login(author)  # Логиним автора в клиенте.
+    client.force_login(author)
     return client
 
 
 @pytest.fixture
 def reader_client(reader):
     client = Client()
-    client.force_login(reader)  # Логиним обычного пользователя в клиенте.
+    client.force_login(reader)
     return client
 
 
@@ -75,7 +71,6 @@ def comments(author, news):
 
 @pytest.fixture
 def news_with_dates():
-    """Создаем новости с датами для теста порядка новостей."""
     today = timezone.now()
     News.objects.bulk_create([
         News(title=f'Новость {index}', text='Просто текст.',

@@ -1,5 +1,6 @@
 from http import HTTPStatus
 
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects, assertFormError
 
@@ -30,13 +31,16 @@ def test_user_can_create_comment(author_client, news, form_data, author):
     assert comment.author == author
 
 
-def test_user_cant_use_bad_words(author_client, news, form_data):
-    comments_count = Comment.objects.count()
+@pytest.mark.parametrize(
+    'bad_words_list',
+    BAD_WORDS
+)
+def test_user_cant_use_bad_words(author_client, bad_words_list, news):
     url = reverse('news:detail', args=(news.id,))
-    form_data['text'] = f'{BAD_WORDS[0]} текст'
-    response = author_client.post(url, data=form_data)
-    assertFormError(response, 'form', 'text', WARNING)
-    assert Comment.objects.count() == comments_count
+    bad_words_data = {'text': f'Какой-то текст, {bad_words_list}, еще текст'}
+    response = author_client.post(url, data=bad_words_data)
+    assertFormError(response.context['form'], 'text', errors=WARNING)
+    assert Comment.objects.count() == 0
 
 
 def test_author_can_delete_comment(author_client, news, comment):
