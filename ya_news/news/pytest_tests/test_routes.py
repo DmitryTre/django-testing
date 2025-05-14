@@ -11,15 +11,51 @@ User = get_user_model()
 @pytest.mark.parametrize(
     'url_fixture, parametrized_client, expected_status, method',
     (
-        (pytest.lazy_fixture('home_url'), pytest.lazy_fixture('client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('news_detail_url'), pytest.lazy_fixture('client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('login_url'), pytest.lazy_fixture('client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('signup_url'), pytest.lazy_fixture('client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('logout_url'), pytest.lazy_fixture('client'), HTTPStatus.OK, 'post'),
-        (pytest.lazy_fixture('edit_url'), pytest.lazy_fixture('author_client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('delete_url'), pytest.lazy_fixture('author_client'), HTTPStatus.OK, 'get'),
-        (pytest.lazy_fixture('edit_url'), pytest.lazy_fixture('reader_client'), HTTPStatus.NOT_FOUND, 'get'),
-        (pytest.lazy_fixture('delete_url'), pytest.lazy_fixture('reader_client'), HTTPStatus.NOT_FOUND, 'get')
+        (
+            pytest.lazy_fixture('home_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('news_detail_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('login_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('signup_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('logout_url'),
+            pytest.lazy_fixture('client'),
+            HTTPStatus.OK, 'post'
+        ),
+        (
+            pytest.lazy_fixture('edit_url'),
+            pytest.lazy_fixture('author_client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('delete_url'),
+            pytest.lazy_fixture('author_client'),
+            HTTPStatus.OK, 'get'
+        ),
+        (
+            pytest.lazy_fixture('edit_url'),
+            pytest.lazy_fixture('reader_client'),
+            HTTPStatus.NOT_FOUND, 'get'
+        ),
+        (
+            pytest.lazy_fixture('delete_url'),
+            pytest.lazy_fixture('reader_client'),
+            HTTPStatus.NOT_FOUND, 'get'
+        )
     ),
 )
 def test_availability(url_fixture,
