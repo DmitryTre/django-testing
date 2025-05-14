@@ -7,7 +7,9 @@ FORM_DATA = {'text': 'Новый текст'}
 
 def test_home_page(client, home_url, news_with_dates):
     response = client.get(home_url)
-    assert len(response.context['object_list']) == settings.NEWS_COUNT_ON_HOME_PAGE
+    assert len(
+        response.context['object_list']
+    ) == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 def test_news_order(client, home_url, news_with_dates):
