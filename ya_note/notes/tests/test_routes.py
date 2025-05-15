@@ -2,44 +2,44 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 
-from .paths_file import URL_REVERSE, BaseTest
+from .content import (HOME_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,
+                      ADD_NOTE_URL, SUCCESS_URL, LIST_URL, DETAIL_URL,
+                      EDIT_URL, DELETE_URL, EXPECTED_ANONYM_TO_LOGIN, BaseTest)
 
 User = get_user_model()
 
 
 class TestRoutes(BaseTest):
 
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-
     def test_pages_availability_for_all(self):
         user_statuses = (
-            (URL_REVERSE.home, self.client, HTTPStatus.OK),
-            (URL_REVERSE.login, self.client, HTTPStatus.OK),
-            (URL_REVERSE.logout, self.client, HTTPStatus.OK),
-            (URL_REVERSE.login, self.client, HTTPStatus.OK),
-            (URL_REVERSE.signup, self.client, HTTPStatus.OK),
-            (URL_REVERSE.add, self.another_author_client, HTTPStatus.OK),
-            (URL_REVERSE.success, self.another_author_client, HTTPStatus.OK),
-            (URL_REVERSE.list, self.another_author_client, HTTPStatus.OK),
-            (URL_REVERSE.detail, self.author_client, HTTPStatus.OK),
-            (URL_REVERSE.edit, self.author_client, HTTPStatus.OK),
-            (URL_REVERSE.delete, self.author_client, HTTPStatus.OK),
-            (URL_REVERSE.detail,
+            (HOME_URL, self.client, HTTPStatus.OK),
+            (LOGIN_URL, self.client, HTTPStatus.OK),
+            (LOGOUT_URL, self.client, HTTPStatus.OK),
+            (SIGNUP_URL, self.client, HTTPStatus.OK),
+            (ADD_NOTE_URL, self.another_author_client, HTTPStatus.OK),
+            (SUCCESS_URL, self.another_author_client, HTTPStatus.OK),
+            (LIST_URL, self.another_author_client, HTTPStatus.OK),
+            (DETAIL_URL, self.author_client, HTTPStatus.OK),
+            (EDIT_URL, self.author_client, HTTPStatus.OK),
+            (DELETE_URL, self.author_client, HTTPStatus.OK),
+            (DETAIL_URL,
              self.another_author_client,
              HTTPStatus.NOT_FOUND),
-            (URL_REVERSE.edit,
+            (EDIT_URL,
              self.another_author_client,
              HTTPStatus.NOT_FOUND),
-            (URL_REVERSE.delete,
+            (DELETE_URL,
              self.another_author_client,
              HTTPStatus.NOT_FOUND),
+            (EXPECTED_ANONYM_TO_LOGIN,
+             self.client,
+             HTTPStatus.OK)
         )
 
         for url, user, status in user_statuses:
             with self.subTest(url=url, user=user, status=status):
-                if url == URL_REVERSE.logout:
+                if url == LOGOUT_URL:
                     response = user.post(url)
                 else:
                     response = user.get(url)
@@ -47,16 +47,15 @@ class TestRoutes(BaseTest):
 
     def test_redirect_for_anonym(self):
         urls = (
-            (URL_REVERSE.detail),
-            (URL_REVERSE.edit),
-            (URL_REVERSE.delete),
-            (URL_REVERSE.add),
-            (URL_REVERSE.success),
-            (URL_REVERSE.list),
+            DETAIL_URL,
+            EDIT_URL,
+            DELETE_URL,
+            ADD_NOTE_URL,
+            SUCCESS_URL,
+            LIST_URL,
         )
 
         for name in urls:
             with self.subTest(name=name):
-                redirect_url = f'{URL_REVERSE.login}?next={name}'
-                response = self.client.get(name)
-                self.assertRedirects(response, redirect_url)
+                self.assertRedirects(self.client.get(name),
+                                     f'{LOGIN_URL}?next={name}')

@@ -1,5 +1,3 @@
-from collections import namedtuple
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -10,33 +8,17 @@ User = get_user_model()
 
 SLUG = 'note-slug'
 
-URL_NAME = namedtuple(
-    'URL_NAME', (
-        'home',
-        'login',
-        'logout',
-        'signup',
-        'add',
-        'success',
-        'list',
-        'detail',
-        'edit',
-        'delete',
-    )
-)
-
-URL_REVERSE = URL_NAME(
-    reverse('notes:home'),
-    reverse('users:login'),
-    reverse('users:logout'),
-    reverse('users:signup'),
-    reverse('notes:add'),
-    reverse('notes:success'),
-    reverse('notes:list'),
-    reverse('notes:detail', args=(SLUG,)),
-    reverse('notes:edit', args=(SLUG,)),
-    reverse('notes:delete', args=(SLUG,)),
-)
+HOME_URL = reverse('notes:home')
+LOGIN_URL = reverse('users:login')
+LOGOUT_URL = reverse('users:logout')
+SIGNUP_URL = reverse('users:signup')
+ADD_NOTE_URL = reverse('notes:add')
+SUCCESS_URL = reverse('notes:success')
+LIST_URL = reverse('notes:list')
+DETAIL_URL = reverse('notes:detail', args=(SLUG,))
+EDIT_URL = reverse('notes:edit', args=(SLUG,))
+DELETE_URL = reverse('notes:delete', args=(SLUG,))
+EXPECTED_ANONYM_TO_LOGIN = f'{LOGIN_URL}?next={ADD_NOTE_URL}'
 
 
 class BaseTest(TestCase):
@@ -56,3 +38,8 @@ class BaseTest(TestCase):
             slug=SLUG,
             author=cls.author,
         )
+        cls.form_data = {
+            'title': 'Новый заголовок',
+            'text': 'Новый текст',
+            'slug': 'new-slug',
+        }
