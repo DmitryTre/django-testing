@@ -6,15 +6,15 @@ FORM_DATA = {'text': 'Новый текст'}
 
 
 def test_home_page(client, home_url, news_with_dates):
-    response = client.get(home_url)
     assert len(
-        response.context['object_list']
+        client.get(home_url).context['object_list']
     ) == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
 def test_news_order(client, home_url, news_with_dates):
-    response = client.get(home_url)
-    all_dates = [news.date for news in response.context['object_list']]
+    all_dates = [news.date for news in client.get(
+        home_url
+    ).context['object_list']]
     assert all_dates == sorted(all_dates, reverse=True)
 
 
@@ -33,7 +33,6 @@ def test_detail_page_not_contains_form_for_anonym(client, news_detail_url):
 def test_comments_order(client, news, news_detail_url, comments):
     response = client.get(news_detail_url)
     assert 'news' in response.context
-    news = response.context['news']
-    all_comments = news.comment_set.all()
-    all_date_created = [comment.created for comment in all_comments]
+    all_date_created = [comment.created for comment in response.context['news']
+                        .comment_set.all()]
     assert all_date_created == sorted(all_date_created)

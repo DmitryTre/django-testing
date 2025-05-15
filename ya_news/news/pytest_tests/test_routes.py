@@ -1,59 +1,83 @@
 import pytest
 
 from http import HTTPStatus
+
 from pytest_django.asserts import assertRedirects
 
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+home_url_fixture = pytest.lazy_fixture('home_url')
+news_detail_url_fixture = pytest.lazy_fixture('news_detail_url')
+client_fixture = pytest.lazy_fixture('client')
+login_url_fixture = pytest.lazy_fixture('login_url')
+signup_url_fixture = pytest.lazy_fixture('signup_url')
+logout_url_fixture = pytest.lazy_fixture('logout_url')
+edit_url_fixture = pytest.lazy_fixture('edit_url')
+delete_url_fixture = pytest.lazy_fixture('delete_url')
+author_client_fixture = pytest.lazy_fixture('author_client')
+reader_client_fixture = pytest.lazy_fixture('reader_client')
+expected_edit_url_fixture = f'{login_url_fixture}?next={edit_url_fixture}'
+expected_delete_url_fixture = f'{login_url_fixture}?next={delete_url_fixture}'
+
 
 @pytest.mark.parametrize(
     'url_fixture, parametrized_client, expected_status, method',
     (
         (
-            pytest.lazy_fixture('home_url'),
-            pytest.lazy_fixture('client'),
+            home_url_fixture,
+            client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('news_detail_url'),
-            pytest.lazy_fixture('client'),
+            news_detail_url_fixture,
+            client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('login_url'),
-            pytest.lazy_fixture('client'),
+            login_url_fixture,
+            client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('signup_url'),
-            pytest.lazy_fixture('client'),
+            signup_url_fixture,
+            client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('logout_url'),
-            pytest.lazy_fixture('client'),
+            logout_url_fixture,
+            client_fixture,
             HTTPStatus.OK, 'post'
         ),
         (
-            pytest.lazy_fixture('edit_url'),
-            pytest.lazy_fixture('author_client'),
+            edit_url_fixture,
+            author_client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('delete_url'),
-            pytest.lazy_fixture('author_client'),
+            delete_url_fixture,
+            author_client_fixture,
             HTTPStatus.OK, 'get'
         ),
         (
-            pytest.lazy_fixture('edit_url'),
-            pytest.lazy_fixture('reader_client'),
+            edit_url_fixture,
+            reader_client_fixture,
             HTTPStatus.NOT_FOUND, 'get'
         ),
         (
-            pytest.lazy_fixture('delete_url'),
-            pytest.lazy_fixture('reader_client'),
+            delete_url_fixture,
+            reader_client_fixture,
+            HTTPStatus.NOT_FOUND, 'get'
+        ),
+        (
+            expected_delete_url_fixture,
+            client_fixture,
+            HTTPStatus.NOT_FOUND, 'get'
+        ),
+        (
+            expected_edit_url_fixture,
+            client_fixture,
             HTTPStatus.NOT_FOUND, 'get'
         )
     ),
@@ -69,10 +93,9 @@ def test_availability(url_fixture,
     assert response.status_code == expected_status
 
 
-@pytest.mark.parametrize(
-    'name', (pytest.lazy_fixture('edit_url'),
-             pytest.lazy_fixture('delete_url'),))
-def test_redirect_for_anonymous_client(client, login_url, name,):
-    expected_url = f'{login_url}?next={name}'
-    response = client.get(name)
-    assertRedirects(response, expected_url)
+@pytest.mark.parametrize('name', (edit_url_fixture, delete_url_fixture))
+def test_redirect_for_anonymous_client(client,
+                                       name,
+                                       expected_redirect_anonym_url):
+    assertRedirects(client.get(name),
+                    expected_redirect_anonym_url)

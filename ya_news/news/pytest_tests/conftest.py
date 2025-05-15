@@ -3,8 +3,11 @@ from datetime import timedelta
 import pytest
 
 from django.conf import settings
+
 from django.urls import reverse
+
 from django.utils import timezone
+
 from django.test.client import Client
 
 from news.models import Comment, News
@@ -13,11 +16,6 @@ from news.models import Comment, News
 @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db):
     pass
-
-
-@pytest.fixture
-def client():
-    return Client()
 
 
 @pytest.fixture
@@ -52,7 +50,7 @@ def news(author):
 
 
 @pytest.fixture
-def create_comment(news, author):
+def comment(news, author):
     return Comment.objects.create(text='Текст комментария',
                                   news=news, author=author)
 
@@ -72,7 +70,7 @@ def comments(author, news):
 @pytest.fixture
 def news_with_dates():
     today = timezone.now()
-    return News.objects.bulk_create(
+    News.objects.bulk_create(
         News(title=f'Новость {index}', text='Просто текст.',
              date=today - timedelta(days=index))
         for index in range(settings.NEWS_COUNT_ON_HOME_PAGE + 1)
@@ -85,13 +83,13 @@ def news_detail_url(news):
 
 
 @pytest.fixture
-def edit_url(create_comment):
-    return reverse('news:edit', args=(create_comment.id,))
+def edit_url(comment):
+    return reverse('news:edit', args=(comment.id,))
 
 
 @pytest.fixture
-def delete_url(create_comment):
-    return reverse('news:delete', args=(create_comment.id,))
+def delete_url(comment):
+    return reverse('news:delete', args=(comment.id,))
 
 
 @pytest.fixture
@@ -112,3 +110,28 @@ def logout_url():
 @pytest.fixture
 def signup_url():
     return reverse('users:signup')
+
+
+@pytest.fixture
+def expected_login_url(login_url, news_detail_url):
+    return f'{login_url()}?next={news_detail_url()}'
+
+
+@pytest.fixture
+def expected_create_comment_success_url(news_detail_url):
+    return f'{news_detail_url}#comments'
+
+
+@pytest.fixture
+def expected_create_comment_not_url(login_url, news_detail_url):
+    return f'{login_url}?next={news_detail_url}'
+
+
+@pytest.fixture
+def expected_edit_or_delete_comment_url(news_detail_url):
+    return f'{news_detail_url}#comments'
+
+
+@pytest.fixture
+def expected_redirect_anonym_url(login_url, name):
+    return f'{login_url}?next={name}'
