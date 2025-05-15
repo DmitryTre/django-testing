@@ -60,7 +60,4 @@ class TestRoutes(BaseTest):
         for name, expected_redirect in urls:
             with self.subTest(name=name):
                 response = self.client.get(name)
-                actual_redirect = response.url
-                print(f"Фактический URL: {actual_redirect}")
-                print(f"Ожидаемый URL: {expected_redirect}")
                 self.assertRedirects(response, expected_redirect)
