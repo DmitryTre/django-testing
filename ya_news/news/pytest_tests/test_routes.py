@@ -3,7 +3,6 @@ import pytest
 from http import HTTPStatus
 
 from pytest_django.asserts import assertRedirects
-
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -25,62 +24,23 @@ expected_delete_url_fixture = f'{login_url_fixture}?next={delete_url_fixture}'
 @pytest.mark.parametrize(
     'url_fixture, parametrized_client, expected_status, method',
     (
-        (
-            home_url_fixture,
-            client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            news_detail_url_fixture,
-            client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            login_url_fixture,
-            client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            signup_url_fixture,
-            client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            logout_url_fixture,
-            client_fixture,
-            HTTPStatus.OK, 'post'
-        ),
-        (
-            edit_url_fixture,
-            author_client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            delete_url_fixture,
-            author_client_fixture,
-            HTTPStatus.OK, 'get'
-        ),
-        (
-            edit_url_fixture,
-            reader_client_fixture,
-            HTTPStatus.NOT_FOUND, 'get'
-        ),
-        (
-            delete_url_fixture,
-            reader_client_fixture,
-            HTTPStatus.NOT_FOUND, 'get'
-        ),
-        (
-            expected_delete_url_fixture,
-            client_fixture,
-            HTTPStatus.NOT_FOUND, 'get'
-        ),
-        (
-            expected_edit_url_fixture,
-            client_fixture,
-            HTTPStatus.NOT_FOUND, 'get'
-        )
-    ),
+        (home_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
+        (news_detail_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
+        (login_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
+        (signup_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
+        (logout_url_fixture, client_fixture, HTTPStatus.OK, 'post'),
+        (edit_url_fixture, author_client_fixture, HTTPStatus.OK, 'get'),
+        (delete_url_fixture, author_client_fixture, HTTPStatus.OK, 'get'),
+        (edit_url_fixture, reader_client_fixture, HTTPStatus.NOT_FOUND, 'get'),
+        (delete_url_fixture, reader_client_fixture,
+         HTTPStatus.NOT_FOUND, 'get'),
+        (expected_delete_url_fixture, client_fixture,
+         HTTPStatus.NOT_FOUND, 'get'),
+        (expected_edit_url_fixture, client_fixture,
+         HTTPStatus.NOT_FOUND, 'get'),
+        (edit_url_fixture, client_fixture, HTTPStatus.FOUND, 'get'),
+        (delete_url_fixture, client_fixture, HTTPStatus.FOUND, 'get'),
+    )
 )
 def test_availability(url_fixture,
                       parametrized_client,
@@ -91,6 +51,11 @@ def test_availability(url_fixture,
     else:
         response = parametrized_client.get(url_fixture)
     assert response.status_code == expected_status
+
+
+@pytest.fixture
+def expected_redirect_anonym_url(login_url, name):
+    return f'{login_url}?next={name}'
 
 
 @pytest.mark.parametrize('name', (edit_url_fixture, delete_url_fixture))

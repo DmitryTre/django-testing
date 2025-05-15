@@ -43,3 +43,7 @@ class BaseTest(TestCase):
             'text': 'Новый текст',
             'slug': 'new-slug',
         }
+        cls.login_url = LOGIN_URL
+
+    def get_redirect_url(self, name):
+        return f'{self.login_url}?next={name}'

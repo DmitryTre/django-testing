@@ -1,8 +1,7 @@
 from django.conf import settings
 
 from news.forms import CommentForm
-
-FORM_DATA = {'text': 'Новый текст'}
+from .test_logic import FORM_DATA
 
 
 def test_home_page(client, home_url, news_with_dates):

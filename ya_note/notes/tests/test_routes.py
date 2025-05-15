@@ -17,6 +17,8 @@ class TestRoutes(BaseTest):
             (LOGIN_URL, self.client, HTTPStatus.OK),
             (LOGOUT_URL, self.client, HTTPStatus.OK),
             (SIGNUP_URL, self.client, HTTPStatus.OK),
+            (ADD_NOTE_URL, self.client, HTTPStatus.FOUND),
+            (DETAIL_URL, self.client, HTTPStatus.FOUND),
             (ADD_NOTE_URL, self.another_author_client, HTTPStatus.OK),
             (SUCCESS_URL, self.another_author_client, HTTPStatus.OK),
             (LIST_URL, self.another_author_client, HTTPStatus.OK),
@@ -47,15 +49,18 @@ class TestRoutes(BaseTest):
 
     def test_redirect_for_anonym(self):
         urls = (
-            DETAIL_URL,
-            EDIT_URL,
-            DELETE_URL,
-            ADD_NOTE_URL,
-            SUCCESS_URL,
-            LIST_URL,
+            (DETAIL_URL, f'{LOGIN_URL}?next={DETAIL_URL}'),
+            (EDIT_URL, f'{LOGIN_URL}?next={EDIT_URL}'),
+            (DELETE_URL, f'{LOGIN_URL}?next={DELETE_URL}'),
+            (ADD_NOTE_URL, f'{LOGIN_URL}?next={ADD_NOTE_URL}'),
+            (SUCCESS_URL, f'{LOGIN_URL}?next={SUCCESS_URL}'),
+            (LIST_URL, f'{LOGIN_URL}?next={LIST_URL}')
         )
 
-        for name in urls:
+        for name, expected_redirect in urls:
             with self.subTest(name=name):
-                self.assertRedirects(self.client.get(name),
-                                     f'{LOGIN_URL}?next={name}')
+                response = self.client.get(name)
+                actual_redirect = response.url
+                print(f"Фактический URL: {actual_redirect}")
+                print(f"Ожидаемый URL: {expected_redirect}")
+                self.assertRedirects(response, expected_redirect)

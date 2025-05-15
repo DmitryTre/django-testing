@@ -1,13 +1,9 @@
 from datetime import timedelta
-
 import pytest
 
 from django.conf import settings
-
 from django.urls import reverse
-
 from django.utils import timezone
-
 from django.test.client import Client
 
 from news.models import Comment, News
@@ -114,24 +110,9 @@ def signup_url():
 
 @pytest.fixture
 def expected_login_url(login_url, news_detail_url):
-    return f'{login_url()}?next={news_detail_url()}'
-
-
-@pytest.fixture
-def expected_create_comment_success_url(news_detail_url):
-    return f'{news_detail_url}#comments'
-
-
-@pytest.fixture
-def expected_create_comment_not_url(login_url, news_detail_url):
     return f'{login_url}?next={news_detail_url}'
 
 
 @pytest.fixture
-def expected_edit_or_delete_comment_url(news_detail_url):
+def expected_comment_success_url(news_detail_url):
     return f'{news_detail_url}#comments'
-
-
-@pytest.fixture
-def expected_redirect_anonym_url(login_url, name):
-    return f'{login_url}?next={name}'
