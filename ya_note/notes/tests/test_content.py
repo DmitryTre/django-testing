@@ -25,7 +25,7 @@ class TestContent(BaseTest):
     def test_pages_contains_form(self):
         urls = (ADD_NOTE_URL, EDIT_URL)
         for url in urls:
-            with self.subTest(name=url):
+            with self.subTest(url=url):
                 self.assertIsInstance(
                     self.author_client.get(url).context.get('form'), NoteForm
                 )

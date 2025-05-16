@@ -116,3 +116,13 @@ def expected_login_url(login_url, news_detail_url):
 @pytest.fixture
 def expected_comment_success_url(news_detail_url):
     return f'{news_detail_url}#comments'
+
+
+@pytest.fixture
+def redirect_edit_url(login_url, edit_url):
+    return f'{login_url}?next={edit_url}'
+
+
+@pytest.fixture
+def redirect_delete_url(login_url, delete_url):
+    return f'{login_url}?next={delete_url}'

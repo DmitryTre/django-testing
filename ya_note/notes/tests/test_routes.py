@@ -42,12 +42,12 @@ class TestRoutes(BaseTest):
             (EXPECTED_ANONYM_TO_LOGIN,
              self.client,
              HTTPStatus.OK),
-            (REDIRECT_LIST_URL, self.client, HTTPStatus.OK),
-            (REDIRECT_ADD_NOTE_URL, self.client, HTTPStatus.OK),
-            (REDIRECT_DELETE_URL, self.client, HTTPStatus.OK),
-            (REDIRECT_EDIT_URL, self.client, HTTPStatus.OK),
-            (REDIRECT_DETAIL_URL, self.client, HTTPStatus.OK),
-            (REDIRECT_SUCCESS_URL, self.client, HTTPStatus.OK),
+            (LIST_URL, self.client, HTTPStatus.FOUND),
+            (ADD_NOTE_URL, self.client, HTTPStatus.FOUND),
+            (DELETE_URL, self.client, HTTPStatus.FOUND),
+            (EDIT_URL, self.client, HTTPStatus.FOUND),
+            (DETAIL_URL, self.client, HTTPStatus.FOUND),
+            (SUCCESS_URL, self.client, HTTPStatus.FOUND),
         )
 
         for url, client, status in user_statuses:

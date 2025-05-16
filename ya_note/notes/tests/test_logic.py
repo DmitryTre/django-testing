@@ -66,19 +66,19 @@ class TestLogic(BaseTest):
         )
 
     def test_author_can_delete_note(self):
-        notes = Note.objects.count()
+        notes_count = Note.objects.count()
         response = self.author_client.delete(DELETE_URL)
         self.assertRedirects(response, SUCCESS_URL)
         self.assertFalse(Note.objects.filter(pk=self.note.pk).exists())
-        self.assertEqual(Note.objects.count(), notes - 1)
+        self.assertEqual(Note.objects.count(), notes_count - 1)
 
     def test_user_cant_delete_note_of_another_user(self):
-        current_notes = Note.objects.values_list('pk', flat=True)
+        notes = Note.objects.values_list('pk', flat=True)
         response = self.another_author_client.delete(DELETE_URL)
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
         self.assertEqual(
             set(Note.objects.values_list('pk', flat=True)),
-            set(current_notes)
+            set(notes)
         )
         note = Note.objects.get(id=self.note.id)
         self.assertEqual(self.note.title, note.title)
