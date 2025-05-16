@@ -19,6 +19,12 @@ DETAIL_URL = reverse('notes:detail', args=(SLUG,))
 EDIT_URL = reverse('notes:edit', args=(SLUG,))
 DELETE_URL = reverse('notes:delete', args=(SLUG,))
 EXPECTED_ANONYM_TO_LOGIN = f'{LOGIN_URL}?next={ADD_NOTE_URL}'
+REDIRECT_DELETE_URL = f'{LOGIN_URL}?next={DELETE_URL}'
+REDIRECT_DETAIL_URL = f'{LOGIN_URL}?next={DETAIL_URL}'
+REDIRECT_EDIT_URL = f'{LOGIN_URL}?next={EDIT_URL}'
+REDIRECT_ADD_NOTE_URL = f'{LOGIN_URL}?next={ADD_NOTE_URL}'
+REDIRECT_SUCCESS_URL = f'{LOGIN_URL}?next={SUCCESS_URL}'
+REDIRECT_LIST_URL = f'{LOGIN_URL}?next={LIST_URL}'
 
 
 class BaseTest(TestCase):

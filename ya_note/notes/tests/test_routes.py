@@ -2,9 +2,14 @@ from http import HTTPStatus
 
 from django.contrib.auth import get_user_model
 
-from .content import (HOME_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,
-                      ADD_NOTE_URL, SUCCESS_URL, LIST_URL, DETAIL_URL,
-                      EDIT_URL, DELETE_URL, EXPECTED_ANONYM_TO_LOGIN, BaseTest)
+from .content import (
+    HOME_URL, LOGIN_URL, LOGOUT_URL, SIGNUP_URL,
+    ADD_NOTE_URL, SUCCESS_URL, LIST_URL, DETAIL_URL,
+    EDIT_URL, DELETE_URL, EXPECTED_ANONYM_TO_LOGIN,
+    REDIRECT_EDIT_URL, REDIRECT_ADD_NOTE_URL,
+    REDIRECT_DELETE_URL, REDIRECT_DETAIL_URL,
+    REDIRECT_LIST_URL, REDIRECT_SUCCESS_URL, BaseTest
+)
 
 User = get_user_model()
 
@@ -36,28 +41,33 @@ class TestRoutes(BaseTest):
              HTTPStatus.NOT_FOUND),
             (EXPECTED_ANONYM_TO_LOGIN,
              self.client,
-             HTTPStatus.OK)
+             HTTPStatus.OK),
+            (REDIRECT_LIST_URL, self.client, HTTPStatus.OK),
+            (REDIRECT_ADD_NOTE_URL, self.client, HTTPStatus.OK),
+            (REDIRECT_DELETE_URL, self.client, HTTPStatus.OK),
+            (REDIRECT_EDIT_URL, self.client, HTTPStatus.OK),
+            (REDIRECT_DETAIL_URL, self.client, HTTPStatus.OK),
+            (REDIRECT_SUCCESS_URL, self.client, HTTPStatus.OK),
         )
 
-        for url, user, status in user_statuses:
-            with self.subTest(url=url, user=user, status=status):
+        for url, client, status in user_statuses:
+            with self.subTest(url=url, user=client, status=status):
                 if url == LOGOUT_URL:
-                    response = user.post(url)
+                    response = getattr(client, 'post')(url)
                 else:
-                    response = user.get(url)
+                    response = getattr(client, 'get')(url)
                 self.assertEqual(response.status_code, status)
 
     def test_redirect_for_anonym(self):
         urls = (
-            (DETAIL_URL, f'{LOGIN_URL}?next={DETAIL_URL}'),
-            (EDIT_URL, f'{LOGIN_URL}?next={EDIT_URL}'),
-            (DELETE_URL, f'{LOGIN_URL}?next={DELETE_URL}'),
-            (ADD_NOTE_URL, f'{LOGIN_URL}?next={ADD_NOTE_URL}'),
-            (SUCCESS_URL, f'{LOGIN_URL}?next={SUCCESS_URL}'),
-            (LIST_URL, f'{LOGIN_URL}?next={LIST_URL}')
+            (DETAIL_URL, REDIRECT_DETAIL_URL),
+            (EDIT_URL, REDIRECT_EDIT_URL),
+            (DELETE_URL, REDIRECT_DELETE_URL),
+            (ADD_NOTE_URL, REDIRECT_ADD_NOTE_URL),
+            (SUCCESS_URL, REDIRECT_SUCCESS_URL),
+            (LIST_URL, REDIRECT_LIST_URL)
         )
 
-        for name, expected_redirect in urls:
-            with self.subTest(name=name):
-                response = self.client.get(name)
-                self.assertRedirects(response, expected_redirect)
+        for url, expected_redirect in urls:
+            with self.subTest(name=url):
+                self.assertRedirects(self.client.get(url), expected_redirect)

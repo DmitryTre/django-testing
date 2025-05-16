@@ -22,7 +22,7 @@ expected_delete_url_fixture = f'{login_url_fixture}?next={delete_url_fixture}'
 
 
 @pytest.mark.parametrize(
-    'url_fixture, parametrized_client, expected_status, method',
+    'url, parametrized_client, expected_status, method',
     (
         (home_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
         (news_detail_url_fixture, client_fixture, HTTPStatus.OK, 'get'),
@@ -42,25 +42,22 @@ expected_delete_url_fixture = f'{login_url_fixture}?next={delete_url_fixture}'
         (delete_url_fixture, client_fixture, HTTPStatus.FOUND, 'get'),
     )
 )
-def test_availability(url_fixture,
-                      parametrized_client,
-                      expected_status,
-                      method):
-    if method == 'post':
-        response = parametrized_client.post(url_fixture)
-    else:
-        response = parametrized_client.get(url_fixture)
+def test_availability(
+    url,
+    parametrized_client,
+    expected_status,
+    method
+):
+    response = getattr(parametrized_client, method)(url)
     assert response.status_code == expected_status
 
 
-@pytest.fixture
-def expected_redirect_anonym_url(login_url, name):
-    return f'{login_url}?next={name}'
-
-
-@pytest.mark.parametrize('name', (edit_url_fixture, delete_url_fixture))
-def test_redirect_for_anonymous_client(client,
-                                       name,
-                                       expected_redirect_anonym_url):
-    assertRedirects(client.get(name),
-                    expected_redirect_anonym_url)
+@pytest.mark.parametrize(
+    ('url', 'redirect_anonym_url'),
+    (
+        (edit_url_fixture, '/auth/login/?next=/edit_comment/1/'),
+        (delete_url_fixture, '/auth/login/?next=/delete_comment/1/')
+    )
+)
+def test_redirect_for_anonymous_client(client, url, redirect_anonym_url):
+    assertRedirects(client.get(url), redirect_anonym_url)

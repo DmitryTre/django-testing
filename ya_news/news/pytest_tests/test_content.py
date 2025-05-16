@@ -1,7 +1,6 @@
 from django.conf import settings
 
 from news.forms import CommentForm
-from .test_logic import FORM_DATA
 
 
 def test_home_page(client, home_url, news_with_dates):
@@ -18,7 +17,7 @@ def test_news_order(client, home_url, news_with_dates):
 
 
 def test_detail_page_contains_form(author_client, news_detail_url):
-    response = author_client.get(news_detail_url, data=FORM_DATA)
+    response = author_client.get(news_detail_url)
     form = response.context['form']
     assert 'form' in response.context
     assert isinstance(form, CommentForm)

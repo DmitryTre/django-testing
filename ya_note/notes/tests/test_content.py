@@ -16,14 +16,16 @@ class TestContent(BaseTest):
         self.assertEqual(self.note.author, note.author)
 
     def test_another_author_context_list(self):
-        self.assertNotIn(self.note,
-                         self.another_author_client
-                         .get(LIST_URL).context['object_list'])
+        self.assertNotIn(
+            self.note,
+            self.another_author_client
+            .get(LIST_URL).context['object_list']
+        )
 
     def test_pages_contains_form(self):
         urls = (ADD_NOTE_URL, EDIT_URL)
-        for name in urls:
-            with self.subTest(name=name):
+        for url in urls:
+            with self.subTest(name=url):
                 self.assertIsInstance(
-                    self.author_client.get(name).context.get('form'), NoteForm
+                    self.author_client.get(url).context.get('form'), NoteForm
                 )
